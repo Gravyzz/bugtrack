@@ -1,0 +1,24 @@
+server:
+  port: ${PORT:8080}
+spring:
+  application:
+    name: bugtrack
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/bugtrack}
+    username: ${DB_USERNAME:bugtrack}
+    password: ${DB_PASSWORD:}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+  mvc:
+    problemdetails:
+      enabled: false
+bugtrack:
+  cookie-secure: ${COOKIE_SECURE:false}
+  demo:
+    enabled: ${DEMO_ENABLED:false}
+    password: ${DEMO_PASSWORD:}
