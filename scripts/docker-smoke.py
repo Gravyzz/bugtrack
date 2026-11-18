@@ -60,6 +60,10 @@ status, bug = request("/api/projects/" + shop["id"] + "/bugs", {
 }, user["csrfToken"])
 check(status == 201 and bug["status"] == "NEW", "Bug creation failed")
 bug_id = bug["id"]
+status, persisted_bug = request("/api/bugs/" + bug_id)
+check(status == 200, "Created bug cannot be read from the database")
+check(all(persisted_bug[key] == value for key, value in bug.items() if key != "createdAt"),
+      "Persisted bug fields differ from the creation response")
 status, history = request("/api/bugs/" + bug_id + "/history")
 check(status == 200 and any(item["action"] == "CREATED" for item in history), "Creation history is missing")
 
@@ -71,7 +75,7 @@ subprocess.run([
 status, user_after = request("/api/auth/me")
 check(status == 200 and user_after["id"] == user["id"], "Session was lost")
 status, bug_after = request("/api/bugs/" + bug_id)
-check(status == 200 and bug_after == bug, "Bug was lost or changed")
+check(status == 200 and bug_after == persisted_bug, "Persisted bug was lost or changed")
 status, history_after = request("/api/bugs/" + bug_id + "/history")
 check(status == 200 and history_after == history, "History changed after recreation")
 print("Docker smoke check passed: web client, login, creation, history, persistent data and session")
